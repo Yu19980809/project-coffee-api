@@ -81,8 +81,44 @@ const fetchCommodities = orderCommodities => new Promise((resolve, reject) => {
   handle()
 })
 
+const fetchAllCommoditiesOrderedData = (commodities, startDate, endDate) => new Promise((resolve, reject) => {
+  const handle = async () => {
+    const len = commodities.length
+    let result = []
+
+    for (let i = 0; i < len; i++) {
+      const commodity = commodities[i]
+      let newCommoditiy = {
+        _id: commodity._id,
+        category_id: commodity.category_id,
+        image: commodity.image,
+        name: commodity.name,
+        count: 0,
+        prices: 0
+      }
+      const orderCommodities = await OrderCommodity.find({
+        commodity_id: commodity._id,
+        createdAt: {
+          $gte: new Date(`${startDate}T00:00:00Z`),
+          $lte: new Date(`${endDate}T23:59:59Z`)
+        }
+      })
+      orderCommodities.forEach(item => {
+        newCommoditiy.count += item.count
+        newCommoditiy.prices += item.price
+      })
+      result.push(newCommoditiy)
+
+      if (i === len - 1) resolve(result)
+    }
+  }
+
+  handle()
+})
+
 export {
   generateOrderCommodities,
   fetchOrderCommodities,
-  fetchCommodities
+  fetchCommodities,
+  fetchAllCommoditiesOrderedData
 }

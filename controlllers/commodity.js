@@ -2,6 +2,7 @@ import Commodity from '../models/commodity.js'
 import Category from '../models/category.js'
 import { isExist, isOtherExist } from './utils.js'
 import { increaseCount, reduceCount } from './category.js'
+import { fetchAllCommoditiesOrderedData } from './orderCommodity.js'
 
 // WEB
 const fetchAllCommodities = async (req, res) => {
@@ -16,6 +17,18 @@ const fetchAllCommodities = async (req, res) => {
   } catch (error) {
     console.log('Failed to fetch all commodities', error)
     res.status(500).json({messae: 'Failed to fetch all commodities'})
+  }
+}
+
+const fetchAllCommoditiesData = async (req, res) => {
+  try {
+    const {startDate, endDate} = req.query
+    const commodities = await Commodity.find().sort({createdAt: -1})
+    const result = await fetchAllCommoditiesOrderedData(commodities, startDate, endDate)
+    res.status(200).json({data: result})
+  } catch (error) {
+    console.log("Failed to fetch commodities' data", error)
+    res.status(500).json({message: "Failed to fetch commodities' data"})
   }
 }
 
@@ -261,6 +274,7 @@ const countCommodities = commodities => new Promise((resolve, reject) => {
 
 export {
   fetchAllCommodities,
+  fetchAllCommoditiesData,
   addCommodity,
   onCommodity,
   offCommodity,

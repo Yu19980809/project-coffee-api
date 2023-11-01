@@ -5,12 +5,14 @@ import {
   deleteOrders,
   fetchAllOrders,
   doneOrder,
-  generateOrder
+  generateOrder,
+  fetchNearest7DaysOrderData
 } from '../controlllers/order.js'
 
 const router = express.Router()
 
 // WEB
+router.get('/web/data', fetchNearest7DaysOrderData)
 router.get('/web', fetchAllOrders)
 router.delete('/web/:id', deleteOrder)
 router.delete('/web/', deleteOrders)

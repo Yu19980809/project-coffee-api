@@ -5,6 +5,7 @@ import User from '../models/user.js'
 import { generateOrderCommodities } from './orderCommodity.js'
 import { countCommodities } from './commodity.js'
 import { fetchCommodities } from './orderCommodity.js'
+import { nearest7days } from '../utils/index.js'
 
 // WEB
 const fetchAllOrders = async (req, res) => {
@@ -86,6 +87,30 @@ const doneOrder = async (req, res) => {
   }
 }
 
+const fetchNearest7DaysOrderData = async (req, res) => {
+  try {
+    // 获取日期
+    const dates = nearest7days()
+    // 根据日期获取订单数量和销售额
+    let results = []
+    for (let i = 0; i < 7; i++) {
+      const date = dates[i]
+      const orders = await Order.find({createdAt: {$gte: new Date(`${date}T00:00:00Z`), $lte: new Date(`${date}T23:59:59Z`)}})
+      let data = {date, count: 0, price: 0}
+      orders.forEach(order => {
+        data.count += order.count
+        data.price += order.price
+      })
+      results.push(data)
+    }
+    // 返回数据
+    res.status(200).json({data: results})
+  } catch (error) {
+    console.log('Failed to fetch order data', error)
+    res.status(500).json({message: 'Failed to fetch order data'})
+  }
+}
+
 // WEAPP
 const generateOrder = async (req, res) => {
   try {
@@ -117,5 +142,6 @@ export {
   deleteOrder,
   deleteOrders,
   doneOrder,
+  fetchNearest7DaysOrderData,
   generateOrder
 }

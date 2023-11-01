@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   fetchAllCommodities,
+  fetchAllCommoditiesData,
   onCommodity,
   offCommodity,
   offCommodities,
@@ -15,6 +16,7 @@ import {
 const router = express.Router()
 
 // WEB
+router.get('/web/data', fetchAllCommoditiesData)
 router.get('/web', fetchAllCommodities)
 router.patch('/web/category', modifyCommoditiesCategory)
 router.patch('/web/on/:id', onCommodity)
